@@ -1,0 +1,4 @@
+env:
+  APP_VERSION: 2.0.8
+service:
+  port: 8080

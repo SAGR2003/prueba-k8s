@@ -1,0 +1,53 @@
+# StatefulSet mysql
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+    tier: database
+spec:
+  serviceName: "mysql"
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: mysql
+      tier: database
+  template:
+    metadata:
+      labels: 
+        app: mysql
+        tier: database
+    spec:
+      containers:
+        - image: mysql:5.7 
+          args:
+            - "--ignore-db-dir=lost+found" 
+          name: mysql
+          env:
+            - name: MYSQL_ROOT_USERNAME
+              value: root
+              
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+
+            - name: MYSQL_DATABASE 
+              value: estudiantes
+
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:        
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql 
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-persistent-storage
+      labels:
+        app: mysql
+        tier: database
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi

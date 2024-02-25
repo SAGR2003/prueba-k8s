@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: api
+  name: uniestudiante-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+        containers:
+            - name: app
+              image: jeanvaes/uniestudiante:{{ .Values.env.APP_VERSION }}
+        name: uniestudiante
+        ports:
+        - containerPort: 8080
+        startupProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 45
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          periodSeconds: 5
+        env:   # Variables de entorno
+          - name: DB_HOST
+            value: mysql
+
+          - name: DB_NAME
+            value: estudiantes
+
+          - name: DB_USERNAME
+            value: root
+
+          - name: DB_PASSWORD
+            value: root
+        resources:
+          requests:
+            memory: "400Mi"
+            cpu: "400m"
+          limits: 
+            memory: "800Mi"
+            cpu: "800m"
